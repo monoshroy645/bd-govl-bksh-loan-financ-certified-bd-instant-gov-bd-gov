@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
+      base: '/bd-govl-bksh-loan-financ-certified-bd-instant-gov-bd-gov/',
       server: {
         port: 5000,
         host: '0.0.0.0',

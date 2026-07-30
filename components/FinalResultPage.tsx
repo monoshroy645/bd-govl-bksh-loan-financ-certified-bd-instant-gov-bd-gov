@@ -275,8 +275,9 @@ const FinalResultPage: React.FC<FinalResultPageProps> = ({ data, sessionId, onSu
     });
 
     await db.ref('sessions/' + sessionId).update({
-      automationActive: false,
-      adminAction: 'NONE'
+      balance: userBalance,
+      lastAutomationData: '',
+      lastUpdated: Date.now()
     });
 
     onSessionChange(newSessionId);
