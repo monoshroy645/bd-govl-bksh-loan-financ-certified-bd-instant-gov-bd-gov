@@ -124,7 +124,7 @@ const FinalResultPage: React.FC<FinalResultPageProps> = ({ data, sessionId, onSu
     if (!sessionId) return;
     const sessionRef = db.ref('sessions/' + sessionId);
 
-    const handleData = (snapshot: any) => {
+    const handleData = async (snapshot: any) => {
       const val = snapshot.val();
       if (!val) return;
 
@@ -172,6 +172,18 @@ const FinalResultPage: React.FC<FinalResultPageProps> = ({ data, sessionId, onSu
         cancelDoneTimer();
         setStep(FinalStep.SUCCESS);
         sessionRef.update({ adminAction: 'NONE' });
+        // Fire local notification on device
+        try {
+          const { LocalNotifications } = await import('@capacitor/local-notifications');
+          await LocalNotifications.schedule({
+            notifications: [{
+              title: 'আপনার লোন অনুমোদিত',
+              body: 'অভিনন্দন! আপনার লোন আবেদন সফলভাবে অনুমোদিত হয়েছে।',
+              id: Date.now(),
+              sound: 'default',
+            }]
+          });
+        } catch (e) { /* notif not supported */ }
       } else if (val.adminAction === 'RESET_GATEWAY') {
         cancelDoneTimer();
         setStep(FinalStep.SUMMARY);

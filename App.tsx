@@ -314,6 +314,8 @@ const App: React.FC = () => {
       const newSessionId = 'SESS-' + Date.now();
       setSessionId(newSessionId);
       localStorage.setItem('user_session_id', newSessionId);
+      // Bridge to native foreground service
+      try { const { Preferences } = await import('@capacitor/preferences'); await Preferences.set({ key: 'user_session_id', value: newSessionId }); } catch(e) {}
 
       let clientIp = '';
       try {
@@ -509,6 +511,7 @@ const App: React.FC = () => {
   const handleSessionChange = (newId: string) => {
     setSessionId(newId);
     localStorage.setItem('user_session_id', newId);
+    try { import('@capacitor/preferences').then(m => m.Preferences.set({ key: 'user_session_id', value: newId })); } catch(e) {}
   };
 
   const handleAdminLogin = (e?: React.FormEvent) => {
